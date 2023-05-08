@@ -25,6 +25,12 @@ def printOutArray(fieldPar):
         print(row)
 
 #Calculate the value of a field point by seeing how many mines are around it
+
+#Since we have the mine coordinates, we can just calculate the distance between every mine and 
+#the field point in question, and if the distance is less than 1.44 (we put this value because
+#we are taking into consideration the points that are diagonal to the point in question, and the distance
+#between two neighbouring diagonal points is square root of 2, which is around 1.41) than a mine is neighbouring
+#that point and we add one to the value of the field point
 def pointNumber(minesPar, pointPar):
     num = 0
     for i in range(len(minesPar)):
@@ -35,16 +41,14 @@ def pointNumber(minesPar, pointPar):
     
 #Return the surrounding points around a certain point
 #(the algorithm could be faster but it would take more space to code)
-def surroundingPoints(fieldPar,markedFieldPar, pointPar):
+def surroundingCoveredPoints(fieldPar,markedFieldPar, pointPar):
     surroundingPointsList = []
     surroundingZeros = []
-    for i in range(len(fieldPar)):
-        for j in range(len(fieldPar)):
-            if math.sqrt((i-pointPar[0])**2+(j-pointPar[1])**2) < 1.44 and markedFieldPar[i][j]!='0' and fieldPar[i][j]=="X" and markedFieldPar[i][j]!="B":
-                surroundingPointsList.append([i,j])
-            elif math.sqrt((i-pointPar[0])**2+(j-pointPar[1])**2) < 1.44 and markedFieldPar[i][j]=='0' and fieldPar[i][j]=="X" and markedFieldPar[i][j]!="B":
-                surroundingZeros.append([i,j])
-    return [surroundingZeros,surroundingPointsList]
+    #Checking all the surrounding coordinates
+    #Every specific point is put in try-except blocks because if the point is on the edge we would
+    #go outside the field and that would return an IndexError
+    try:
+        if (markedField[pointPar[0]-1][pointPar[1]-1]!="B" and fieldPar[pointPar[0]-1][pointPar[1]-1]=="X")
 
 #Replaces the covered field point with its value
 def uncoverPoint(fieldPar, markedFieldPar, pointPar):
@@ -56,14 +60,14 @@ def uncoverPoint(fieldPar, markedFieldPar, pointPar):
 #and are neighbouring those zeros will be uncovered, thus a special algorithm is needed for this "chain" of uncovering
 def uncoverZerosChain(fieldPar,markedFieldPar,uncoveredPointPar):
     newField = fieldPar
-    neigbhouringPoint = surroundingPoints(fieldPar,markedFieldPar,uncoveredPointPar)
+    neigbhouringPoint = surroundingCoveredPoints(fieldPar,markedFieldPar,uncoveredPointPar)
     for i in range(len(neigbhouringPoint[0])):
         newField = uncoverPoint(fieldPar,markedFieldPar,neigbhouringPoint[0][i])
     for i in range(len(neigbhouringPoint[1])):
         newField = uncoverPoint(fieldPar,markedFieldPar,neigbhouringPoint[1][i])
     otherZeros = neigbhouringPoint[0]
     while len(otherZeros)!=0:
-        surroundingTheZero = surroundingPoints(newField,markedFieldPar,otherZeros[0])
+        surroundingTheZero = surroundingCoveredPoints(newField,markedFieldPar,otherZeros[0])
         for i in range(len(surroundingTheZero[0])):
             newField = uncoverPoint(newField,markedFieldPar,surroundingTheZero[0][i])
         for i in range(len(surroundingTheZero[1])):
