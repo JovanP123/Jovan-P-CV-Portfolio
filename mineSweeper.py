@@ -26,10 +26,10 @@ def printOutArray(fieldPar):
 
 #Calculate the value of a field point by seeing how many mines are around it
 
-#Since we have the mine coordinates, we can just calculate the distance between every mine and 
+#Since we have the coordinates of the mienes, we can just calculate the distance between every mine and 
 #the field point in question, and if the distance is less than 1.44 (we put this value because
 #we are taking into consideration the points that are diagonal to the point in question, and the distance
-#between two neighbouring diagonal points is square root of 2, which is around 1.41) than a mine is neighbouring
+#between two neighbouring diagonal points is square root of 2, which is around 1.41) then a mine is neighbouring
 #that point and we add one to the value of the field point
 def pointNumber(minesPar, pointPar):
     num = 0
@@ -39,39 +39,40 @@ def pointNumber(minesPar, pointPar):
             num+=1
     return num
     
-#Return the surrounding points around a certain point
-#(the algorithm could be faster but it would take more space to code)
+#-Return the surrounding points around a certain point
+#-We do that by checking all surrounding points via the surroundingValues list of operations that
+#we need to do to the x and y coordinates of the point in question, and we check if the values after 
+#the operations are within the range of values that are in bounds of the field, so that we won't get an IndexError
 def surroundingCoveredPoints(fieldPar,markedFieldPar, pointPar):
     surroundingPointsList = []
-    surroundingZeros = []
+    surroundingZerosList = []
     surroundingValues = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]
     for i in range(8):
-        try:
+        if (pointPar[0]+surroundingValues[i][0]>=0 and pointPar[1]+surroundingValues[i][1]>=0 and pointPar[0]+surroundingValues[i][0]<len(fieldPar) and pointPar[1]+surroundingValues[i][1]<len(fieldPar)):
             if (markedFieldPar[pointPar[0]+surroundingValues[i][0]][pointPar[1]+surroundingValues[i][1]]!="B" and fieldPar[pointPar[0]+surroundingValues[i][0]][pointPar[1]+surroundingValues[i][1]]=="X"):
                 if (markedFieldPar[pointPar[0]+surroundingValues[i][0]][pointPar[1]+surroundingValues[i][1]]=='0'):
-                    surroundingZeros.append([pointPar[0]+surroundingValues[i][0],pointPar[1]+surroundingValues[i][1]])
-                                            
-    #Checking all the surrounding coordinates
-    #Every specific point is put in try-except blocks because if the point is on the edge we would
-    #go outside the field and that would return an IndexError
+                    surroundingZerosList.append([pointPar[0]+surroundingValues[i][0],pointPar[1]+surroundingValues[i][1]])
+                    continue
+                surroundingPointsList.append([pointPar[0]+surroundingValues[i][0],pointPar[1]+surroundingValues[i][1]])
+    return [surroundingZerosList,surroundingPointsList]
     
 
-#Replaces the covered field point with its value
+#-Replaces the covered field point with its value
 def uncoverPoint(fieldPar, markedFieldPar, pointPar):
     newField = fieldPar
     newField[pointPar[0]][pointPar[1]] = markedFieldPar[pointPar[0]][pointPar[1]]
     return newField
 
-#When a zero field point is uncovered, all the surrounding points that are zeros and the points that have a bigger value than zero
-#and are neighbouring those zeros will be uncovered, thus a special algorithm is needed for this "chain" of uncovering
+#-When a zero field point is uncovered, all the surrounding points that are zeros and the points that have a bigger value than zero
+#and are neighbouring those zeros will be uncovered, thus a special algorithm is needed for this "chain" of uncovering field points
 def uncoverZerosChain(fieldPar,markedFieldPar,uncoveredPointPar):
     newField = fieldPar
-    neigbhouringPoint = surroundingCoveredPoints(fieldPar,markedFieldPar,uncoveredPointPar)
-    for i in range(len(neigbhouringPoint[0])):
-        newField = uncoverPoint(fieldPar,markedFieldPar,neigbhouringPoint[0][i])
-    for i in range(len(neigbhouringPoint[1])):
-        newField = uncoverPoint(fieldPar,markedFieldPar,neigbhouringPoint[1][i])
-    otherZeros = neigbhouringPoint[0]
+    neighbouringPoint = surroundingCoveredPoints(fieldPar,markedFieldPar,uncoveredPointPar)
+    for i in range(len(neighbouringPoint[0])):
+        newField = uncoverPoint(fieldPar,markedFieldPar,neighbouringPoint[0][i])
+    for i in range(len(neighbouringPoint[1])):
+        newField = uncoverPoint(fieldPar,markedFieldPar,neighbouringPoint[1][i])
+    otherZeros = neighbouringPoint[0]
     while len(otherZeros)!=0:
         surroundingTheZero = surroundingCoveredPoints(newField,markedFieldPar,otherZeros[0])
         for i in range(len(surroundingTheZero[0])):
@@ -83,7 +84,7 @@ def uncoverZerosChain(fieldPar,markedFieldPar,uncoveredPointPar):
             otherZeros.append(surroundingTheZero[0][i])
     return newField
 
-#A function that checks if the remaining field points, flagged or not, are just bombs, if yes
+#-A function that checks if the remaining field points, flagged or not, are just mines, if yes
 #then the player has won
 def checkIfHasWon(fieldPar,markedFieldPar):
     for i in range(len(fieldPar)):
@@ -92,7 +93,7 @@ def checkIfHasWon(fieldPar,markedFieldPar):
                 return False
     return True
 
-#Take input from user
+#-Take input from user
 field = []
 lengthOfField = int(input("Insert the length of the field:"))
 numberOfMines = int(input("Insert the number of mines:"))
@@ -101,7 +102,7 @@ for i in range(lengthOfField):
     for j in range(lengthOfField):
         field[i].append("X")
 
-#Create mines
+#-Create mines
 minesCords = []
 for i in range(numberOfMines):
     while True:
@@ -111,7 +112,7 @@ for i in range(numberOfMines):
             minesCords.append([xCor,yCor])
             break
 
-#Mark the field with the mines and the free fields with its numbers
+#-Mark the field with the mines and the free fields with its numbers
 markedField = []
 for i in range(lengthOfField):
     markedField.append([])
@@ -121,34 +122,42 @@ for i in range(lengthOfField):
         else:
             markedField[i].append(str(pointNumber(minesCords,[i,j])))
 
-#Gameplay
-flaggedBombs = 0
+#-Gameplay
+flaggedMines = 0
 while True:
     printOutArray(field)
-    #Taking the desicion of the player
+    #-Taking the desicion of the player
     desicion = input("Flag/Unflag/Uncover:")
     desicion = desicion.split(" ")
     coordinates = desicion[1].split(",")
     coordinates[0] = int(coordinates[0]) - 1
     coordinates[1] = int(coordinates[1]) - 1
-    #Check if the input coordinates are out of bound
+    #-Check if the input coordinates are out of bound
     if coordinates[0]>=lengthOfField or coordinates[1]>=lengthOfField:
         print("That point is out of bounds!")
-    #If the desicion is to flag a field, first we check if the field 
+    #-If the desicion is to flag a field, first we check if the field is covered, because we can't flag an open field,
+    #then, we check via the marked field if the player has flagged a mine, if so we add to the flaggedMines counter
     if desicion[0] == "Flag":
         if field[coordinates[0]][coordinates[1]] != "X":
-            print("You can't flag an open field")
+            print("You can't flag an open point")
         else:
             field[coordinates[0]][coordinates[1]] = "F"
             if checkIfMinePoint(coordinates,minesCords):
-                flaggedBombs += 1
+                flaggedMines += 1
+    #-This will return the point to being uncovered, if the chosen point is a flagged point
+    #it will unflag it, and if there is a mine on that flagged point, it will subtract from the flaggedMines counter
     elif desicion[0] == "Unflag":
         if field[coordinates[0]][coordinates[1]] == "F": 
             field[coordinates[0]][coordinates[1]] = "X"
             if markedField[coordinates[0]][coordinates[1]]=="B":
-                flaggedBombs -= 1
-        else: print("That field is not flagged")
-    if desicion[0] == "Uncover":
+                flaggedMines -= 1
+        else: print("That point is not flagged")
+    #-This will uncover the field, there are four cases
+    #1. If the point value is a number bigger than one, than we just uncover the chosen point
+    #2. If the point value is zero, than we do the zeros chain uncovering funcion
+    #3. If the point we uncovered is flagged, we restart since we don't want to uncover a flagged point
+    #4. If the point is a bomb, it's game over
+    elif desicion[0] == "Uncover":
         if checkIfMinePoint(coordinates,minesCords):
             print("YOU UNCOVERED A MINE!!! GAME OVER")
             for i in range(len(field)):
@@ -157,7 +166,7 @@ while True:
                         field[i][j] = "B"
             printOutArray(field)
             numOfMinesGuessed = 0
-            if flaggedBombs==1:
+            if flaggedMines==1:
                 print("You flagged 1 mine")
             else:
                 print("You flagged "+str(numOfMinesGuessed)+" mines")
@@ -168,6 +177,7 @@ while True:
             field[coordinates[0]][coordinates[1]] = markedField[coordinates[0]][coordinates[1]]
         else:
             field = uncoverZerosChain(field, markedField, coordinates)
+    #This checks if the player has won using the function check if has won
     if checkIfHasWon(field, markedField):
         printOutArray(field)
         print("YOU WON!")
