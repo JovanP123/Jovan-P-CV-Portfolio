@@ -44,11 +44,17 @@ def pointNumber(minesPar, pointPar):
 def surroundingCoveredPoints(fieldPar,markedFieldPar, pointPar):
     surroundingPointsList = []
     surroundingZeros = []
+    surroundingValues = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]
+    for i in range(8):
+        try:
+            if (markedFieldPar[pointPar[0]+surroundingValues[i][0]][pointPar[1]+surroundingValues[i][1]]!="B" and fieldPar[pointPar[0]+surroundingValues[i][0]][pointPar[1]+surroundingValues[i][1]]=="X"):
+                if (markedFieldPar[pointPar[0]+surroundingValues[i][0]][pointPar[1]+surroundingValues[i][1]]=='0'):
+                    surroundingZeros.append([pointPar[0]+surroundingValues[i][0],pointPar[1]+surroundingValues[i][1]])
+                                            
     #Checking all the surrounding coordinates
     #Every specific point is put in try-except blocks because if the point is on the edge we would
     #go outside the field and that would return an IndexError
-    try:
-        if (markedField[pointPar[0]-1][pointPar[1]-1]!="B" and fieldPar[pointPar[0]-1][pointPar[1]-1]=="X")
+    
 
 #Replaces the covered field point with its value
 def uncoverPoint(fieldPar, markedFieldPar, pointPar):
