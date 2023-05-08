@@ -1,22 +1,22 @@
 import random
 import math
 
-#Minesweeper game in Terminal
+#-Minesweeper game in Terminal
 
-#Check if the newly generated mine coordinates are the same as a previous mine
+#-Check if the newly generated mine coordinates are the same as a previous mine
 def alreadyAMineThere(minesPar, newMineCordsPar):
     for i in range(len(minesPar)):
         if minesPar[i] == newMineCordsPar: return True
     return False
 
-#Check if the point selected is a mine
+#-Check if the point selected is a mine
 def checkIfMinePoint(pointCordsPar, minesCordsPar):
     for i in range(len(minesCordsPar)):
         if pointCordsPar == minesCordsPar[i]:
             return True
     return False
 
-#Print out the mine field
+#-Print out the mine field
 def printOutArray(fieldPar):
     for i in range(len(field)):
         for j in range(len(field)):
@@ -24,9 +24,9 @@ def printOutArray(fieldPar):
             else: row += " " + fieldPar[i][j]
         print(row)
 
-#Calculate the value of a field point by seeing how many mines are around it
+#-Calculate the value of a field point by seeing how many mines are around it
 
-#Since we have the coordinates of the mienes, we can just calculate the distance between every mine and 
+#-Since we have the coordinates of the mienes, we can just calculate the distance between every mine and 
 #the field point in question, and if the distance is less than 1.44 (we put this value because
 #we are taking into consideration the points that are diagonal to the point in question, and the distance
 #between two neighbouring diagonal points is square root of 2, which is around 1.41) then a mine is neighbouring
