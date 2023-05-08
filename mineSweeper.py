@@ -1,7 +1,7 @@
 import random
 import math
 
-#Minesweeper game
+#Minesweeper game in Terminal
 
 #Check if the newly generated mine coordinates are the same as a previous mine
 def alreadyAMineThere(minesPar, newMineCordsPar):
