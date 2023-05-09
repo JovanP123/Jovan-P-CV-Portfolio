@@ -2,6 +2,7 @@ from microbit import *
 import random
 
 #Snake game for BBC microbit
+#Copy this code into https://python.microbit.org/v/3 to test it out
 
 #-Moves the entire snake
 #-It does that by turning off the light of the current position of the certain part of
