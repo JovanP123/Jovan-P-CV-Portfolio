@@ -356,6 +356,7 @@ def gameOn(dashed,word,tableMult,gubBuk,gubZbo):
 userIn = ""
 again = None
 
+#Gameplay
 while True:
   if again!=True:
     userIn = input("Играј? д|н:")
